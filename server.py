@@ -42,14 +42,14 @@ def parse_request(conn, addr):
 
     response_status_line = "HTTP/1.1 200 OK\r\n"
     response_headers = "Content-Type: text/html; charset=UTF-8\r\n" \
-                       "Content-Length: %s" \
-                       "Connection: close" % len(response_body)
+                       "Content-Length: %s\r\n" \
+                       "Connection: close\r\n" % len(response_body)
 
     conn.send(response_status_line.encode("utf-8"))
     conn.send(response_headers.encode("utf-8"))
-    conn.send("\n")
+    conn.send("\r\n")
     conn.send(response_body)
-    conn.close()
+    # conn.close()
 
 
 def main():
