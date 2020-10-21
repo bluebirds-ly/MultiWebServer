@@ -1,6 +1,8 @@
 import socket
 import time
 import importlib
+import threading
+import os
 from io import BytesIO
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from http.server import BaseHTTPRequestHandler
@@ -8,6 +10,8 @@ from http.server import BaseHTTPRequestHandler
 IP = "127.0.0.1"
 PORT = 8888
 MAX_CONNECTIONS = 20
+CRLF = "\r\n"
+mu = threading.Lock()
 
 
 class HTTPRequest(BaseHTTPRequestHandler):
@@ -73,11 +77,21 @@ def parse_request(conn, addr):
                 response_body = file.read()
             status_code = "404 Not Found"
 
+    file_suffix = file_name.split(".")[-1]
+    type_dict = {"html": "text/html",
+                 "css": "text/css",
+                 "js": "application/javascript",
+                 "php": "application/javascript",
+                 "jpg": "image/jpeg",
+                 "png": "image/png",
+                 "gif": "image/gif"
+                 }
+
     response_status_line = "HTTP/1.0 {}\r\n".format(status_code)
     date = "Date: {} GMT\r\n".format(time.asctime())
     content_length = "Content-Length: {}\r\n".format(len(response_body))
     connection = "Connection: close\r\n"
-    content_type = "Content-Type: text/html; charset=UTF-8\r\n"
+    content_type = "Content-Type: {}\r\n".format(type_dict[file_suffix])
     response_headers = date + content_length + connection + content_type
 
     # conn.sendall(response_status_line.encode("utf-8"))
@@ -95,6 +109,47 @@ def parse_request(conn, addr):
     # print("\r\n")
     # print(response_body)
     conn.close()
+    add_log(request_bytes, int(status_code.split()[0]), len(response_body), -1, addr)
+
+
+# 写日志文件_by_47
+def add_log(data,status,size,visiter_id,addr):
+
+    packet = data.decode('utf-8').split(CRLF)
+    user = ''
+    refer = ''
+    for item in packet:
+        if (item.split(':')[0] == 'User-Agent'):
+            user = item
+        if (item.split(':')[0] == 'Referer'):
+            refer = item
+    request = str(packet[0])
+    logmsg = str(addr) + ' '
+    logmsg += 'id: "' + str(visiter_id)+'"'
+    logmsg += '--[' + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) + ']; '
+    logmsg += request + '; ' + user + '; '
+    if(status==200):
+        logmsg += 'HTTP Status:200 OK; Size: "'+str(size)+'"'
+    elif status==404:
+        logmsg += 'HTTP Status:404 Not Found; '
+    elif status==400:
+        logmsg += 'HTTP Status:400 Bad Request; '
+
+    if (len(refer) != 0):
+        logmsg += '"' + refer + '"'
+    if mu.acquire(True):  # 2、获取锁状态，一个线程有锁时，别的线程只能在外面等着
+        if os.path.exists('server_log.txt'):
+            fp = open('server_log.txt', 'a+')
+        else:
+            # os.system('server_log.txt')
+            fp = open('server_log.txt', 'a+')
+        try:
+            fp.write(str(logmsg) + '\n')
+        finally:
+            fp.close()
+            print('write log file finish!')
+        mu.release()  # 3、释放锁
+# end by_47
 
 
 def main():
@@ -109,7 +164,7 @@ def main():
         while True:
             conn, addr = sock.accept()
             task = executor.submit(parse_request, conn, addr)
-            # task.add_done_callback()
+            # task.add_done_callback(add_log)
             # print(task.result())
 
 
