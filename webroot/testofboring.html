@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>boringtest</title>
+    <link rel="stylesheet" href="littletest_files/boringteststyle.css">
+    <script>
+        var starttime;
+        var endtime;
+        function checkdate () {
+            var date=new Date();
+            var hour=date.getHours();
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? ('0' + m) : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            var h = date.getHours();
+            h=h < 10 ? ('0' + h) : h;
+            var minute = date.getMinutes();
+            minute = minute < 10 ? ('0' + minute) : minute;
+            var second=date.getSeconds();
+            second=second < 10 ? ('0' + second) : second;
+            document.getElementById("date").innerHTML="It's "+y + "-" + m + "-" + d+" "+h+":"+minute+":"+second;
+            if(hour>0&&hour<=12)
+            {
+                document.getElementById("hello").innerHTML="Good Morning";
+            }
+            else if(hour>12&&hour<=18)
+            {
+                document.getElementById("hello").innerHTML="Good Afternoon";
+            }
+            else
+            {
+                document.getElementById("hello").innerHTML="Good Evening";
+            }
+        }
+        function time1() {
+            var date=new Date();
+            var h = date.getHours();
+            var minute=date.getMinutes();
+            var second=date.getSeconds();
+            starttime=h*3600+minute*60+second;
+        }
+        function mark() {
+            var date=new Date();
+            var h = date.getHours();
+            var minute=date.getMinutes();
+            var second=date.getSeconds();
+            endtime=h*3600+minute*60+second;
+            endtime-=starttime;
+            var sum=0;
+            var q1=boringtest.teacher.value;
+            var q2=boringtest.country.value;
+            var obj=boringtest.great;
+            var q3="";
+            for(k in obj)
+            {
+                if(obj[k].checked)
+                    q3+=obj[k].value;
+            }
+            if(q1=="wuhao")
+                sum+=20;
+            if(q2=="bit1"||q2=="bit2"||q2=="bit3"||q2=="bit4")
+                sum+=30;
+            if(q3=="deyixueyishangwangshemi")
+                sum+=50;
+            document.getElementsByName("time")[0].value = endtime;
+            document.getElementsByName("score")[0].value = sum;
+            alert("你的用时为" + endtime + "秒" + "\n" + "你的最终的分为" + sum + "分");
+        }
+    </script>
+</head>
+<body>
+<script>
+    time1();
+</script>
+<div id="head">
+    <p id="date"></p>
+    <p id="hello"></p>
+    <script>
+      setInterval(function () {
+            checkdate()
+        }, 1000);
+    </script>
+</div>
+<div id="main">
+    <h1>A Boring Test</h1>
+    <p>The test covers astronomy and geography, and those who get full marks must be the greatest minds in a century</p>
+    <h2>Are you ready?</h2>
+    <input type="button" value="Yes!" class="button">
+    <p>想要英文版题目请自行百度翻译</p>
+</div>
+<div >
+    <form  onsubmit="mark(this)"   name="boringtest" method="post" action="testofboring.html">
+        <div id="test">
+            <label for="usb">你的名字</label>
+            <input type="text" id="usb" name="usb" />
+            <fieldset>
+                <legend><em>单项选择题</em></legend>
+                1.下列哪一位是计算机科学与技术专业的辅导员？(20分）<br />
+                <label><input type="radio" name="teacher" value="wuhao" />吴昊</label>
+                <label><input type="radio" name="teacher" value="wujing" />吴京</label>
+                <label><input type="radio" name="teacher" value="wulei" />吴磊</label>
+                <label><input type="radio" name="teacher" value="wuyifan" />吴亦凡</label><br />
+                2.今年哪所大学举办了80周年校庆（30分）<br />
+                <label><input type="radio" name="country" value="bit1" />北理</label>
+                <label><input type="radio" name="country" value="bit2" />北理工</label>
+                <label><input type="radio" name="country" value="bit3" />北京理工大学</label>
+                <label><input type="radio" name="country" value="bit4" />世界一流理工科大学</label>
+            </fieldset>
+            <fieldset>
+                <legend><em>多项选择题：多选选错少选均不得分</em></legend>
+                1.请在下列选项中选出北京理工大学校训（50分）<br>
+                <label><input type="checkbox" name="great" value="deyi">德以明理</label>
+                <label><input type="checkbox" name="great" value="xueyi">学以精工</label>
+                <label><input type="checkbox" name="great" value="shangwang">上网不涉密</label>
+                <label><input type="checkbox" name="great" value="shemi">涉密不上网</label>
+            </fieldset>
+        </div>
+        <input type="text" name="score" class="shuju"/>
+        <input type="text" name="time" class="shuju"/>
+        <input type="submit" class="button" value="提交答案" >
+    </form>
+</div>
+</body>
+</html>

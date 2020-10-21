@@ -1,0 +1,26 @@
+*
+{
+    margin: auto;
+    padding: auto;
+}
+body
+{
+    background-image: url("index_pic.jpg");
+    background-size: cover;
+}
+.formelement input
+{
+    position:fixed;
+    top: 320px;
+    left: 700px;
+}
+.name
+{
+    color: deepskyblue;
+    font-size: 60px;
+}
+.button input
+{
+    width: 60px;
+    height: 50px;
+}
