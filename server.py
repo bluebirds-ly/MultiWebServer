@@ -6,12 +6,14 @@ import os
 from io import BytesIO
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from http.server import BaseHTTPRequestHandler
+from urllib import parse as urllib_parse
 
 IP = "127.0.0.1"
 PORT = 8888
 MAX_CONNECTIONS = 20
 CRLF = "\r\n"
 mu = threading.Lock()
+visitor_id = 0
 
 
 class HTTPRequest(BaseHTTPRequestHandler):
@@ -42,29 +44,33 @@ def parse_request(conn, addr):
     print(request_body)
     print("-----request end-----")
 
-    file_name = request_data.path.lstrip("/").split("?")[0]
-
+    urlres = urllib_parse.urlparse(request_data.path)
+    file_name = urlres.path.lstrip("/")
+    args = urllib_parse.parse_qs(urlres.query)
     if request_data.command == "POST":
-        args = request_body
-    elif request_data.command == "GET":
-        if "?" in request_data.path:
-            args = request_data.path.split("?")[1]
-        else:
-            args = ""
-    else:
-        args = ""
+        args = urllib_parse.parse_qs(request_body)
 
-    if args:
-        args = args.split("&")
-        args = {arg.split("=")[0]: arg.split("=")[1] for arg in args}
-    else:
-        args = {}
+    # if request_data.command == "POST":
+    #     args = request_body
+    # elif request_data.command == "GET":
+    #     if "?" in request_data.path:
+    #         args = request_data.path.split("?")[1]
+    #     else:
+    #         args = ""
+    # else:
+    #     args = ""
+    #
+    # if args:
+    #     args = args.split("&")
+    #     args = {arg.split("=")[0]: arg.split("=")[1] for arg in args}
+    # else:
+    #     args = {}
 
     response_body = ""
     status_code = "200 OK"
     if file_name.startswith("cgi-bin/"):
         if file_name.endswith(".py"):
-            module = file_name.lstrip("cgi-bin/").rstrip(".py")
+            module = file_name.replace("cgi-bin/", '').replace('.py', '')
             pybin = importlib.import_module('.' + module, package="cgi-bin")
             response_body = pybin.run(args).encode("utf-8")
     else:
@@ -79,12 +85,13 @@ def parse_request(conn, addr):
 
     file_suffix = file_name.split(".")[-1]
     type_dict = {"html": "text/html",
+                 "py": "text/html",
                  "css": "text/css",
                  "js": "application/javascript",
                  "php": "application/javascript",
                  "jpg": "image/jpeg",
                  "png": "image/png",
-                 "gif": "image/gif"
+                 "gif": "image/gif",
                  }
 
     response_status_line = "HTTP/1.0 {}\r\n".format(status_code)
@@ -109,7 +116,9 @@ def parse_request(conn, addr):
     # print("\r\n")
     # print(response_body)
     conn.close()
-    add_log(request_bytes, int(status_code.split()[0]), len(response_body), -1, addr)
+    global visitor_id
+    visitor_id += 1
+    add_log(request_bytes, int(status_code.split()[0]), len(response_body), visitor_id, addr)
 
 
 # 写日志文件_by_47
