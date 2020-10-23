@@ -3,16 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Calculator</title>
-</head>
+    <style>
+        body{
+            background-image: url("./pics/calculator_pic.jpg");
+            background-size: cover;
+        }
+    </style>
 <body>
-<form name="input" action="cgi-bin/calculator.py" method="get">
-    num1<input type="text" name="num1"><br>
-    op&nbsp&nbsp&nbsp&nbsp&nbsp<select name="op">
+<h1 style="font-size: 80px;text-align:center;color:black">
+        Calculator
+</h1>
+<form name="input" action="cgi-bin/calculator.py" method="post" style="position:fixed;top:250px;left:550px;font-size:40px">
+    num1<input type="text" name="num1" style="font-size:30px"><br>
+    op&nbsp&nbsp&nbsp&nbsp&nbsp<select name="op" style="font-size:30px">
         <option value="+">+</option>
         <option value="-">-</option>
+        <option value="*">*</option>
+        <option value="/">/</option>
+        <option value="%">%</option>
     </select><br>
-    num2<input type="text" name="num2"><br>
-    <input type="submit" value="calculate">
+    num2<input type="text" name="num2" style="font-size:30px"><br>
+    <input type="submit" value="calculate"  style="position:relative;left:100px;font-size:20px;width:200px;height:50px" >
 </form>
 </body>
 </html>

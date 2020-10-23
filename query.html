@@ -4,22 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Query</title>
+    <style>
+        body{
+            background-image: url("./pics/query_pic.jpg");
+            background-size: cover;
+        }
+    </style>
 </head>
 
 <body>
-    <form name="input" action="cgi-bin/query.py" method="get">
-        Student ID&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" name="StudentID"><br>
-        Student Name&nbsp<input type="text" name="StudentName"><br>
+    <h1 style="font-size: 80px;text-align:center;color:black">
+        Query
+    </h1>
+    <form name="input" action="cgi-bin/query.py" method="get" style="position:fixed;top:250px;left:500px;font-size:40px;">
+        Student ID&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" name="StudentID" style="font-size:30px"><br>
+        Student Name&nbsp<input type="text" name="StudentName" style="font-size:30px"><br>
         Class&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text"
-            name="Class"><br>
+            name="Class" style="font-size:30px"><br>
         op&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-        <select name="op">
+        <select name="op" style="font-size:30px">
             <option value="Query">Query</option>
             <option value="Insert">Insert</option>
             <option value="Delete">Delete</option>
+            <option value="Show All">Show All</option>
         </select>
         <br>
-        <input type="submit" value="submit"><br>
+        <input type="submit" value="submit" style="position:relative;left:150px;font-size:20px;width:200px;height:50px"><br>
     </form>
 </body>
 

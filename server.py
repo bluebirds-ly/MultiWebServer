@@ -68,6 +68,9 @@ def parse_request(conn, addr):
 
     response_body = ""
     status_code = "200 OK"
+
+    if file_name == "":
+        file_name = "index.html"
     if file_name.startswith("cgi-bin/"):
         if file_name.endswith(".py"):
             module = file_name.replace("cgi-bin/", '').replace('.py', '')
