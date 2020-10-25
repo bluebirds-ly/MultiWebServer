@@ -10,7 +10,7 @@ from urllib import parse as urllib_parse
 
 IP = "127.0.0.1"
 PORT = 8888
-MAX_CONNECTIONS = 20
+MAX_CONNECTIONS = 2     # set a lower number for test
 CRLF = "\r\n"
 mu = threading.Lock()
 visitor_id = 0
@@ -82,9 +82,14 @@ def parse_request(conn, addr):
                 response_body = file.read()
             status_code = "200 OK"
         except FileNotFoundError:
-            with open("404.html", "rb") as file:
-                response_body = file.read()
-            status_code = "404 Not Found"
+            if file_name == "%":
+                with open("400.html", "rb") as file:
+                    response_body = file.read()
+                status_code = "400 Bad Request"
+            else:
+                with open("404.html", "rb") as file:
+                    response_body = file.read()
+                status_code = "404 Not Found"
 
     file_suffix = file_name.split(".")[-1]
     type_dict = {"html": "text/html",
@@ -101,7 +106,8 @@ def parse_request(conn, addr):
     date = "Date: {} GMT\r\n".format(time.asctime())
     content_length = "Content-Length: {}\r\n".format(len(response_body))
     connection = "Connection: close\r\n"
-    content_type = "Content-Type: {}\r\n".format(type_dict[file_suffix])
+    content_type = "Content-Type: {}\r\n".format(
+        type_dict.get(file_suffix, "text/html"))
     response_headers = date + content_length + connection + content_type
 
     # conn.sendall(response_status_line.encode("utf-8"))
@@ -118,14 +124,16 @@ def parse_request(conn, addr):
     # print(response_headers)
     # print("\r\n")
     # print(response_body)
+    time.sleep(5)   # sleep for a while for test
     conn.close()
     global visitor_id
     visitor_id += 1
-    add_log(request_bytes, int(status_code.split()[0]), len(response_body), visitor_id, addr)
+    add_log(request_bytes, int(status_code.split()[0]), len(
+        response_body), visitor_id, addr)
 
 
 # 写日志文件_by_47
-def add_log(data,status,size,visiter_id,addr):
+def add_log(data, status, size, visiter_id, addr):
 
     packet = data.decode('utf-8').split(CRLF)
     user = ''
@@ -137,14 +145,15 @@ def add_log(data,status,size,visiter_id,addr):
             refer = item
     request = str(packet[0])
     logmsg = str(addr) + ' '
-    logmsg += 'id: "' + str(visiter_id)+'"'
-    logmsg += '--[' + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) + ']; '
+    logmsg += 'id: "' + str(visiter_id) + '"'
+    logmsg += '--[' + str(time.strftime("%Y-%m-%d %H:%M:%S",
+                                        time.localtime())) + ']; '
     logmsg += request + '; ' + user + '; '
-    if(status==200):
-        logmsg += 'HTTP Status:200 OK; Size: "'+str(size)+'"'
-    elif status==404:
+    if(status == 200):
+        logmsg += 'HTTP Status:200 OK; Size: "' + str(size) + '"'
+    elif status == 404:
         logmsg += 'HTTP Status:404 Not Found; '
-    elif status==400:
+    elif status == 400:
         logmsg += 'HTTP Status:400 Bad Request; '
 
     if (len(refer) != 0):
