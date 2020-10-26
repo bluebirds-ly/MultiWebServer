@@ -10,7 +10,7 @@ from urllib import parse as urllib_parse
 
 IP = "127.0.0.1"
 PORT = 8888
-MAX_CONNECTIONS = 2     # set a lower number for test
+MAX_CONNECTIONS = 20     # set a lower number for test
 CRLF = "\r\n"
 mu = threading.Lock()
 visitor_id = 0
@@ -114,8 +114,8 @@ def parse_request(conn, addr):
     # conn.sendall(response_headers.encode("utf-8"))
     # conn.sendall("\r\n")
     # conn.sendall(response_body)
-    response = response_status_line.encode("utf-8") + response_headers.encode("utf-8") \
-        + "\r\n".encode("utf-8") + response_body
+    response = response_status_line.encode("utf-8") + response_headers.encode(
+        "utf-8") + "\r\n".encode("utf-8") + (response_body if request_data.command != "HEAD" else b'')
     conn.sendall(response)
     print("-----response begin-----")
     print(response.decode("utf-8"))
@@ -124,7 +124,7 @@ def parse_request(conn, addr):
     # print(response_headers)
     # print("\r\n")
     # print(response_body)
-    time.sleep(5)   # sleep for a while for test
+    # time.sleep(5)   # sleep for a while for test
     conn.close()
     global visitor_id
     visitor_id += 1
